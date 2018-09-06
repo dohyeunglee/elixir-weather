@@ -1,18 +1,11 @@
 defmodule ElixirWeather do
-  @moduledoc """
-  Documentation for ElixirWeather.
-  """
+  def temperature_of(cities) do
+    coordinator_pid = spawn(ElixirWeather.Coordinator, :loop, [[], Enum.count(cities)])
 
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> ElixirWeather.hello
-      :world
-
-  """
-  def hello do
-    :world
+    cities
+    |> Enum.each(fn city ->
+      worker_pid = spawn(ElixirWeather.Worker, :loop, [])
+      send(worker_pid, {coordinator_pid, city})
+    end)
   end
 end
